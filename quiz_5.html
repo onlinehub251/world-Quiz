@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>World Capitals Quiz</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--ink:#28104f;--ok:#1fb25a;--bad:#e5384b;--yel:#ffeb3b;--pink:#e91e63}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;background:#ff9f43;background:linear-gradient(160deg,#ff5796,#ff9f43 45%,#9b59ff 75%,#3c50ff) fixed;
+font-family:"Poppins","Segoe UI",Arial,sans-serif;color:var(--ink);display:flex;justify-content:center}
+main{width:100%;max-width:460px;min-height:100vh;padding:16px 20px 22px;display:flex;flex-direction:column;align-items:center}
+[hidden]{display:none!important}
+button,select{font:inherit;cursor:pointer}
+.title{background:var(--yel);color:var(--ink);padding:10px 24px 8px;transform:rotate(-2deg);text-align:center;font-weight:800;line-height:1;box-shadow:0 6px 0 rgba(40,16,79,.3);margin:6px 0 4px}
+.title b{display:block;font-size:46px}.title span{display:block;font-size:28px;margin-top:3px;color:var(--pink)}
+.card{background:#fff;border-radius:28px;padding:22px 20px;width:100%;box-shadow:0 8px 0 rgba(40,16,79,.25);text-align:center}
+.bar{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:15px}
+.chip{background:#fff;color:var(--ink);border-radius:999px;padding:7px 14px;box-shadow:0 4px 0 rgba(40,16,79,.25);display:flex;gap:8px;align-items:center;max-width:62%}
+.chip .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip .pt{background:var(--yel);border-radius:999px;padding:2px 10px;white-space:nowrap;transition:transform .25s}
+.chip .pt.pop{transform:scale(1.35)}
+#music{background:#fff;border:0;border-radius:50%;width:38px;height:38px;font-size:18px;box-shadow:0 4px 0 rgba(40,16,79,.25)}
+h1{font-size:23px;margin:0;font-weight:800}
+#stage{width:100%;margin-top:22px;display:flex;flex-direction:column;align-items:center;gap:22px}
+.opts{width:100%;display:flex;flex-direction:column;gap:13px}
+.opt{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:0;text-align:left}
+.opt .k{flex:none;width:44px;height:44px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;display:grid;place-items:center;transition:background .2s}
+.opt .t{flex:1;color:#fff;font-weight:700;font-size:19px;padding:11px 20px;border-radius:999px;box-shadow:0 5px 0 rgba(40,16,79,.3);transition:background .2s,transform .15s}
+.opt:not(:disabled):active .t{transform:translateY(3px)}
+.opt:disabled{cursor:default}
+.opt:nth-child(1) .t{background:#7c4dff}.opt:nth-child(2) .t{background:#00a8e8}.opt:nth-child(3) .t{background:#f5a000}.opt:nth-child(4) .t{background:#d81b8a}
+.opt.correct .t{background:var(--ok)}.opt.correct .k{background:#0f7a3c}
+.opt.wrong .t{background:var(--bad)}.opt.wrong .k{background:#a01e2d}
+.opt.dim{opacity:.55}
+#msg{font-weight:800;font-size:17px;text-align:center;background:#fff;padding:9px 20px;border-radius:999px;min-height:42px}
+#msg:empty{visibility:hidden}
+nav{margin-top:auto;padding-top:26px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.arrow{flex:none;width:58px;height:58px;border-radius:50%;border:0;background:#fff;color:var(--ink);font-size:26px;font-weight:800;box-shadow:0 5px 0 rgba(40,16,79,.3)}
+.arrow:disabled{opacity:.35;cursor:default}
+.arrow:not(:disabled):active{transform:translateY(3px)}
+.dots{flex:1;display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+.dots i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.5)}
+.dots i.cur{background:#fff;transform:scale(1.35)}.dots i.ok{background:var(--ok)}.dots i.bad{background:var(--bad)}
+.prog{width:100%;height:12px;background:rgba(255,255,255,.4);border-radius:99px;overflow:hidden}
+.prog u{display:block;height:100%;background:var(--yel);transition:width .3s}
+footer{padding-top:18px;font-weight:700;font-size:15px;color:#fff}
+.floaty{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:-1}
+.floaty span{position:absolute;bottom:-60px;font-size:34px;opacity:.55;animation:rise 9s linear infinite}
+@keyframes rise{to{transform:translateY(-115vh) rotate(40deg)}}
+.globe{font-size:72px;line-height:1;animation:bob 2s ease-in-out infinite;margin-top:4px}
+@keyframes bob{50%{transform:translateY(-10px) scale(1.06)}}
+.hero{color:#fff;font-weight:800;font-size:22px;margin-top:14px;text-shadow:0 3px 0 rgba(40,16,79,.35);text-align:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.chips span{background:rgba(255,255,255,.92);border-radius:999px;padding:5px 12px;font-weight:700;font-size:13px;box-shadow:0 3px 0 rgba(40,16,79,.2)}
+.cta.go{background:var(--yel);color:var(--ink);font-size:22px;padding:15px 40px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.badge{font-size:84px;line-height:1;animation:bob 1.2s ease-in-out infinite}
+.verdict{font-size:30px;font-weight:800;color:var(--pink);margin:6px 0 2px;line-height:1.1}
+.stars{font-size:30px;letter-spacing:3px}
+.shake{animation:shake .4s}
+.opt.picked .t{outline:4px solid #fff;outline-offset:2px}
+.cta.share{background:linear-gradient(90deg,#ff5796,#ff9f43);display:block;margin:14px auto 0;width:100%}
+.timer{width:100%;display:flex;align-items:center;gap:10px}
+.timer .tb{flex:1;height:14px;border-radius:99px;background:rgba(255,255,255,.4);overflow:hidden}
+.timer .tb u{display:block;height:100%;width:100%;background:#7cff64;transition:width .1s linear,background .3s}
+.timer b{flex:none;background:#fff;border-radius:50%;width:42px;height:42px;display:grid;place-items:center;font-weight:800;font-size:19px;box-shadow:0 4px 0 rgba(40,16,79,.25)}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.big{background:var(--yel);border-radius:22px;padding:14px;margin:14px 0;font-size:46px;font-weight:800}
+.cta{border:0;border-radius:999px;background:var(--ink);color:#fff;font-weight:800;font-size:19px;padding:13px 34px;box-shadow:0 5px 0 rgba(0,0,0,.25);margin:8px 4px 0}
+.cta.alt{background:#7c4dff}
+input,select{width:100%;font:inherit;font-weight:700;font-size:18px;padding:12px 18px;border-radius:999px;border:3px solid #7c4dff;text-align:center;text-align-last:center;color:var(--ink);background:#fff;margin-top:12px;outline:none}
+label{display:block;text-align:left;font-weight:800;font-size:14px;margin:12px 6px -6px}
+#hint{min-height:20px;color:var(--bad);font-weight:700;font-size:14px;margin-top:6px}
+</style>
+</head>
+<body>
+<main>
+  <section id="start" style="width:100%;display:flex;flex-direction:column;align-items:center;margin-top:2vh">
+    <div class="floaty" aria-hidden="true"><span style="left:6%;animation-delay:0s">🌍</span><span style="left:20%;animation-delay:2s">⭐</span><span style="left:36%;animation-delay:4s">✈️</span><span style="left:52%;animation-delay:1s">🧭</span><span style="left:68%;animation-delay:3s">🏆</span><span style="left:84%;animation-delay:5s">🗺️</span><span style="left:92%;animation-delay:2.5s">🎯</span></div>
+    <div class="globe">🌍</div>
+    <div class="title"><b>Quiz</b><span>Time!</span></div>
+    <div class="hero">World Capitals Challenge</div>
+    <div class="chips"><span>🌍 187 countries</span><span>⭐ Win points</span><span>🎧 Focus music</span></div>
+    <div class="card" style="margin-top:20px">
+      <h1>Ready to play? 🚀</h1>
+      <p style="margin:8px 0 0;font-weight:600">You get 15 seconds per question. Each correct answer = 1 point!</p>
+      <input id="nameIn" maxlength="16" placeholder="Your name" autocomplete="off">
+      <label for="region">Region</label>
+      <select id="region">
+        <option value="all">🌍 Whole world</option><option value="F">Africa</option><option value="E">Europe</option>
+        <option value="S">Asia</option><option value="M">Americas</option><option value="O">Oceania</option>
+      </select>
+      <label for="num">Questions</label>
+      <select id="num"><option value="10">10 questions</option><option value="20">20 questions</option><option value="50">50 questions</option><option value="all">All countries</option></select>
+      <div id="hint"></div>
+      <button class="cta go" id="go">Let's Go! 🚀</button>
+      <p style="font-size:13px;margin:12px 0 0;font-weight:600">🎧 Calm focus music plays during the quiz (you can mute it).</p>
+    </div>
+  </section>
+
+  <section id="app" hidden style="width:100%;display:flex;flex-direction:column;align-items:center;flex:1">
+    <div class="bar">
+      <button id="music" aria-label="Toggle music">🔊</button>
+      <span id="count"></span>
+      <div class="chip"><span class="nm" id="pname"></span><span class="pt" id="ppts">⭐ 0</span></div>
+    </div>
+    <div class="title"><b>Quiz</b><span>Time!</span></div>
+    <div id="stage"></div>
+    <nav>
+      <button class="arrow" id="prev" aria-label="Previous">❮</button>
+      <div class="dots" id="dots"></div>
+      <button class="arrow" id="next" aria-label="Next">❯</button>
+    </nav>
+  </section>
+  <footer>@onlinehub251</footer>
+</main>
+
+<script>
+/* ---------- data: 187 countries (left out those with several/disputed/changing capitals) ---------- */
+const RAW={
+F:"Algeria|Algiers;Angola|Luanda;Benin|Porto-Novo;Botswana|Gaborone;Burkina Faso|Ouagadougou;Burundi|Gitega;Cabo Verde|Praia;Cameroon|Yaoundé;Central African Republic|Bangui;Chad|N'Djamena;Comoros|Moroni;Republic of the Congo|Brazzaville;Côte d'Ivoire|Yamoussoukro;DR Congo|Kinshasa;Djibouti|Djibouti;Egypt|Cairo;Equatorial Guinea|Malabo;Eritrea|Asmara;Ethiopia|Addis Ababa;Gabon|Libreville;Gambia|Banjul;Ghana|Accra;Guinea|Conakry;Guinea-Bissau|Bissau;Kenya|Nairobi;Lesotho|Maseru;Liberia|Monrovia;Libya|Tripoli;Madagascar|Antananarivo;Malawi|Lilongwe;Mali|Bamako;Mauritania|Nouakchott;Mauritius|Port Louis;Morocco|Rabat;Mozambique|Maputo;Namibia|Windhoek;Niger|Niamey;Nigeria|Abuja;Rwanda|Kigali;São Tomé and Príncipe|São Tomé;Senegal|Dakar;Seychelles|Victoria;Sierra Leone|Freetown;Somalia|Mogadishu;South Sudan|Juba;Sudan|Khartoum;Tanzania|Dodoma;Togo|Lomé;Tunisia|Tunis;Uganda|Kampala;Zambia|Lusaka;Zimbabwe|Harare",
+E:"Albania|Tirana;Andorra|Andorra la Vella;Austria|Vienna;Belarus|Minsk;Belgium|Brussels;Bosnia and Herzegovina|Sarajevo;Bulgaria|Sofia;Croatia|Zagreb;Cyprus|Nicosia;Czechia|Prague;Denmark|Copenhagen;Estonia|Tallinn;Finland|Helsinki;France|Paris;Germany|Berlin;Greece|Athens;Hungary|Budapest;Iceland|Reykjavik;Ireland|Dublin;Italy|Rome;Latvia|Riga;Liechtenstein|Vaduz;Lithuania|Vilnius;Luxembourg|Luxembourg City;Malta|Valletta;Moldova|Chișinău;Monaco|Monaco;Montenegro|Podgorica;Netherlands|Amsterdam;North Macedonia|Skopje;Norway|Oslo;Poland|Warsaw;Portugal|Lisbon;Romania|Bucharest;Russia|Moscow;San Marino|San Marino;Serbia|Belgrade;Slovakia|Bratislava;Slovenia|Ljubljana;Spain|Madrid;Sweden|Stockholm;Switzerland|Bern;Ukraine|Kyiv;United Kingdom|London",
+S:"Afghanistan|Kabul;Armenia|Yerevan;Azerbaijan|Baku;Bahrain|Manama;Bangladesh|Dhaka;Bhutan|Thimphu;Brunei|Bandar Seri Begawan;Cambodia|Phnom Penh;China|Beijing;Georgia|Tbilisi;India|New Delhi;Iran|Tehran;Iraq|Baghdad;Japan|Tokyo;Jordan|Amman;Kazakhstan|Astana;Kuwait|Kuwait City;Kyrgyzstan|Bishkek;Laos|Vientiane;Lebanon|Beirut;Malaysia|Kuala Lumpur;Maldives|Malé;Mongolia|Ulaanbaatar;Myanmar|Naypyidaw;Nepal|Kathmandu;North Korea|Pyongyang;Oman|Muscat;Pakistan|Islamabad;Philippines|Manila;Qatar|Doha;Saudi Arabia|Riyadh;Singapore|Singapore;South Korea|Seoul;Syria|Damascus;Tajikistan|Dushanbe;Thailand|Bangkok;Timor-Leste|Dili;Turkey|Ankara;Turkmenistan|Ashgabat;United Arab Emirates|Abu Dhabi;Uzbekistan|Tashkent;Vietnam|Hanoi;Yemen|Sana'a",
+M:"Antigua and Barbuda|St. John's;Argentina|Buenos Aires;Bahamas|Nassau;Barbados|Bridgetown;Belize|Belmopan;Brazil|Brasília;Canada|Ottawa;Chile|Santiago;Colombia|Bogotá;Costa Rica|San José;Cuba|Havana;Dominica|Roseau;Dominican Republic|Santo Domingo;Ecuador|Quito;El Salvador|San Salvador;Grenada|St. George's;Guatemala|Guatemala City;Guyana|Georgetown;Haiti|Port-au-Prince;Honduras|Tegucigalpa;Jamaica|Kingston;Mexico|Mexico City;Nicaragua|Managua;Panama|Panama City;Paraguay|Asunción;Peru|Lima;Saint Kitts and Nevis|Basseterre;Saint Lucia|Castries;Saint Vincent and the Grenadines|Kingstown;Suriname|Paramaribo;Trinidad and Tobago|Port of Spain;United States|Washington, D.C.;Uruguay|Montevideo;Venezuela|Caracas",
+O:"Australia|Canberra;Fiji|Suva;Kiribati|Tarawa;Marshall Islands|Majuro;Micronesia|Palikir;Nauru|Yaren;New Zealand|Wellington;Palau|Ngerulmud;Papua New Guinea|Port Moresby;Samoa|Apia;Solomon Islands|Honiara;Tonga|Nukuʻalofa;Tuvalu|Funafuti;Vanuatu|Port Vila"};
+const POOL={};let TOTAL=0;
+for(const r in RAW){POOL[r]=RAW[r].split(";").map(s=>{const p=s.split("|");return{c:p[0],cap:p[1],r}});TOTAL+=POOL[r].length}
+const $=id=>document.getElementById(id);
+$("num").querySelector('[value=all]').textContent="All countries";
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let Q=[],name="",i=0,ans=[];
+const score=()=>ans.reduce((s,v,k)=>s+(v===Q[k].a?1:0),0);
+
+function build(){
+  const reg=$("region").value;
+  let list=reg==="all"?Object.values(POOL).flat():POOL[reg];
+  list=shuffle(list);
+  const n=$("num").value==="all"?list.length:Math.min(+$("num").value,list.length);
+  Q=list.slice(0,n).map(x=>{
+    const wrong=shuffle(POOL[x.r].filter(y=>y.cap!==x.cap)).slice(0,3).map(y=>y.cap);
+    const o=shuffle([x.cap,...wrong]);
+    return{q:"What is the capital of "+x.c+"?",o,a:o.indexOf(x.cap)};
+  });
+  ans=Q.map(()=>null);i=0;
+}
+
+/* ---------- calm focus music (Web Audio, nothing to download) ---------- */
+let ac,master,mus,timer,muted=false,st=0,nextT=0,noiseBuf;
+const STEP=0.4,VOL=0.55;
+const CH=[{b:38,n:[62,66,69]},{b:45,n:[61,64,69]},{b:47,n:[62,66,71]},{b:43,n:[62,67,71]}]; // D  A  Bm  G (uplifting)
+const PENT=[62,64,66,69,71,74,76];
+const SEQ=[0,1,2,1,0,2,1,2];
+const mf=m=>440*Math.pow(2,(m-69)/12);
+function tone(f,t,d,type,v,att,dest){
+  const o=ac.createOscillator(),g=ac.createGain();
+  o.type=type;o.frequency.value=f;o.connect(g);g.connect(dest||mus);
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v,t+att);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.start(t);o.stop(t+d+0.1);
+}
+function kick(t){
+  const o=ac.createOscillator(),g=ac.createGain();
+  o.frequency.setValueAtTime(110,t);o.frequency.exponentialRampToValueAtTime(42,t+0.18);
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(0.22,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+0.35);
+}
+function hat(t){
+  const s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
+  s.buffer=noiseBuf;f.type="highpass";f.frequency.value=7000;
+  g.gain.setValueAtTime(0.018,t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.06);
+  s.connect(f);f.connect(g);g.connect(master);s.start(t);s.stop(t+0.08);
+}
+function sched(){
+  while(nextT<ac.currentTime+0.8){
+    const s=st%8,c=CH[Math.floor(st/8)%4];
+    if(s===0){
+      c.n.forEach(m=>{tone(mf(m-12),nextT,STEP*8,"triangle",0.035,1.2);tone(mf(m-12)*1.004,nextT,STEP*8,"sine",0.04,1.2)});
+      tone(mf(c.b),nextT,STEP*7.5,"sine",0.16,0.05,master);
+    }
+    if(s%4===0)kick(nextT);
+    if(s%4===2)hat(nextT);
+    tone(mf(c.n[SEQ[s]]),nextT,STEP*2.2,"triangle",0.05,0.02);
+    if(s%2===0&&Math.random()<0.35)tone(mf(PENT[Math.floor(Math.random()*PENT.length)]+12),nextT,STEP*3,"sine",0.045,0.03);
+    st++;nextT+=STEP;
+  }
+}
+function startMusic(){
+  if(ac)return;
+  try{
+    ac=new(window.AudioContext||window.webkitAudioContext)();
+    const lp=ac.createBiquadFilter();lp.type="lowpass";lp.frequency.value=2200;
+    master=ac.createGain();master.gain.value=VOL;master.connect(lp);lp.connect(ac.destination);
+    mus=ac.createGain();mus.connect(master);
+    const len=ac.sampleRate*2.6,imp=ac.createBuffer(2,len,ac.sampleRate);
+    for(let ch=0;ch<2;ch++){const d=imp.getChannelData(ch);for(let k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.pow(1-k/len,2.5)}
+    const rv=ac.createConvolver();rv.buffer=imp;const rg=ac.createGain();rg.gain.value=0.45;mus.connect(rv);rv.connect(rg);rg.connect(master);
+    noiseBuf=ac.createBuffer(1,ac.sampleRate*0.2,ac.sampleRate);
+    const nd=noiseBuf.getChannelData(0);for(let k=0;k<nd.length;k++)nd[k]=Math.random()*2-1;
+    ac.resume();nextT=ac.currentTime+0.1;sched();timer=setInterval(sched,250);
+  }catch(e){$("music").hidden=true}
+}
+function chime(ok){
+  if(!ac)return;const t=ac.currentTime+0.02;
+  if(ok){tone(mf(76),t,0.5,"sine",0.12,0.01,master);tone(mf(83),t+0.12,0.6,"sine",0.12,0.01,master)}
+  else tone(mf(52),t,0.5,"triangle",0.14,0.01,master);
+}
+$("music").onclick=()=>{
+  if(!ac)return;muted=!muted;
+  master.gain.setTargetAtTime(muted?0:VOL,ac.currentTime,0.1);
+  $("music").textContent=muted?"🔇":"🔊";
+};
+document.addEventListener("visibilitychange",()=>{if(ac)document.hidden?ac.suspend():ac.resume()});
+
+/* ---------- quiz ---------- */
+function start(){
+  const v=$("nameIn").value.trim();
+  if(!v){$("hint").textContent="Please type your name first";return}
+  name=v;$("pname").textContent=name;
+  $("start").hidden=true;$("app").hidden=false;
+  startMusic();build();render();
+}
+$("go").onclick=start;
+$("nameIn").addEventListener("keydown",e=>{if(e.key==="Enter")start()});
+function pts(pop){
+  const p=$("ppts"),s=score();p.textContent="⭐ "+s+" pt"+(s===1?"":"s");
+  if(pop){p.classList.add("pop");setTimeout(()=>p.classList.remove("pop"),250)}
+}
+function dots(){
+  const d=$("dots");d.innerHTML="";
+  if(Q.length>20){
+    const done=ans.filter(v=>v!==null).length;
+    d.innerHTML='<div class="prog"><u style="width:'+(done/Q.length*100)+'%"></u></div>';return;
+  }
+  Q.forEach((q,k)=>{
+    const e=document.createElement("i");
+    if(ans[k]!==null)e.className=ans[k]===q.a?"ok":"bad";
+    if(k===i)e.classList.add("cur");
+    d.appendChild(e);
+  });
+}
+function render(){
+  const stg=$("stage");stg.innerHTML="";stopT();clearTimeout(adv);pts(false);dots();
+  $("prev").disabled=i===0;$("next").disabled=i>=Q.length;
+  if(i>=Q.length){
+    $("count").textContent="Results";
+    const s=score(),n=Q.length,pc=Math.round(s/n*100);
+    const T=pc===100?["👑","YOU ARE A MASTER!","Perfect score! Nobody knows the world like you."]:pc>=90?["🧠","LITTLE GENIUS!","Wow, almost perfect! Your brain is on fire."]:pc>=70?["👏","BRAVO!","Great job! You really know your geography."]:pc>=50?["🌟","AWESOME!","Nice work! A little more practice and you'll be a master."]:pc>=30?["💪","KEEP GOING!","Good effort! Every round makes you smarter."]:["🌱","GREAT START!","Every master was once a beginner. Try again!"];
+    const stars=Math.round(pc/20);
+    const left=ans.filter(v=>v===null).length;
+    stg.innerHTML='<div class="card"><div class="badge">'+T[0]+'</div><div class="verdict">'+T[1]+'</div><h1>Well done, <span id="rn"></span>!</h1><div class="big">'+s+' / '+n+'<div style="font-size:15px;font-weight:700">'+pc+'% correct</div></div><div class="stars">'+"⭐".repeat(stars)+'<span style="opacity:.25">'+"⭐".repeat(5-stars)+'</span></div><p style="font-weight:700;margin:10px 0 0">'+T[2]+'</p>'+
+      (left?'<p style="font-weight:600;margin:10px 0 0">You skipped '+left+' question'+(left>1?"s":"")+'. Go back with ❮ to answer them.</p>':'')+
+      '<button class="cta share" id="share">Invite a friend 📤</button><div id="shmsg" style="font-weight:700;font-size:14px;min-height:20px;margin-top:8px"></div><button class="cta" id="again">Play again ↻</button><button class="cta alt" id="home">Change region</button></div>';
+    $("rn").textContent=name;
+    if(pc>=50)rain(pc>=90?260:150);
+    $("share").onclick=()=>shareScore(s,n,T[1]);
+    $("again").onclick=()=>{build();render()};
+    $("home").onclick=()=>{$("app").hidden=true;$("start").hidden=false};
+    return;
+  }
+  const q=Q[i],a=ans[i];
+  $("count").textContent=(i+1)+" / "+Q.length;
+  const tm=document.createElement("div");tm.className="timer";tm.innerHTML='<div class="tb"><u id="tbar"></u></div><b id="tnum">15</b>';stg.appendChild(tm);
+  const c=document.createElement("div");c.className="card";
+  const h=document.createElement("h1");h.textContent=q.q;c.appendChild(h);stg.appendChild(c);
+  const box=document.createElement("div");box.className="opts";
+  q.o.forEach((t,k)=>{
+    const b=document.createElement("button");b.className="opt";
+    b.innerHTML='<span class="k">'+"ABCD"[k]+'.</span><span class="t"></span>';
+    b.querySelector(".t").textContent=t;
+    b.onclick=()=>pick(k);box.appendChild(b);
+  });
+  stg.appendChild(box);
+  const m=document.createElement("div");m.id="msg";m.setAttribute("aria-live","polite");stg.appendChild(m);
+  if(a!==null){tm.style.visibility="hidden";paint(a,false)}else startT();
+}
+function paint(k,fresh){
+  const q=Q[i],ok=k===q.a;
+  document.querySelectorAll("#stage .opt").forEach((b,j)=>{
+    b.disabled=true;
+    b.classList.add(j===q.a?"correct":"wrong");
+    if(j===k)b.classList.add("picked");
+  });
+  const m=$("msg");
+  m.textContent=ok?"Correct! +1 point 🎉":k<0?"⏰ Time's up! Answer: "+"ABCD"[q.a]+". "+q.o[q.a]:"Wrong! Answer: "+"ABCD"[q.a]+". "+q.o[q.a];
+  m.style.color=ok?"#127a3f":"#b3202f";
+  dots();pts(fresh&&ok);
+  if(fresh){chime(ok);if(ok)rain(110);else shake();stopT();const at=i;adv=setTimeout(()=>{if(i===at)go(1)},2000)}
+}
+/* ---------- celebration rain ---------- */
+const cv=document.createElement("canvas");
+cv.style.cssText="position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:50";
+document.body.appendChild(cv);
+const cx=cv.getContext("2d");let P=[],raf=0;
+function fit(){cv.width=innerWidth;cv.height=innerHeight}
+fit();addEventListener("resize",fit);
+const COL=["#ff5796","#ffeb3b","#00e5ff","#7cff64","#ffffff","#ff9f43","#b388ff"],EM=["⭐","🎉","✨","🌟"];
+function rain(n){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  for(let k=0;k<n;k++)P.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*0.6,vx:(Math.random()-.5)*2,vy:3+Math.random()*5,s:7+Math.random()*9,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:COL[Math.floor(Math.random()*COL.length)],e:Math.random()<.18?EM[Math.floor(Math.random()*EM.length)]:null});
+  if(!raf)raf=requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  P=P.filter(p=>p.y<cv.height+30);
+  for(const p of P){
+    p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);
+    if(p.e){cx.font=(p.s*2.2)+"px serif";cx.fillText(p.e,0,0)}
+    else{cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2)}
+    cx.restore();
+  }
+  raf=P.length?requestAnimationFrame(tick):0;
+}
+function shake(){const m=$("msg");m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake")}
+/* ---------- 10-second timer per question ---------- */
+const TIME=15;let tmr=0,adv=0;
+function stopT(){clearInterval(tmr);tmr=0}
+function startT(){
+  stopT();
+  const end=Date.now()+TIME*1000,bar=$("tbar"),num=$("tnum");
+  const upd=()=>{
+    const left=Math.max(0,end-Date.now());
+    bar.style.width=(left/(TIME*1000)*100)+"%";
+    num.textContent=Math.ceil(left/1000);
+    bar.style.background=left<3000?"#ff4d4d":left<6000?"#ffb300":"#7cff64";
+    num.style.color=left<3000?"#e5384b":"";
+    if(left<=0){stopT();if(ans[i]===null){ans[i]=-1;paint(-1,true)}}
+  };
+  upd();tmr=setInterval(upd,100);
+}
+async function shareScore(s,n,title){
+  const url=location.href.split("#")[0];
+  const text="🌍 I scored "+s+"/"+n+" on the World Capitals Quiz and earned “"+title+"”! Can you beat me? 🏆";
+  const msg=$("shmsg");
+  try{
+    if(navigator.share){await navigator.share({title:"World Capitals Quiz",text,url});return}
+  }catch(e){if(e&&e.name==="AbortError")return}
+  try{await navigator.clipboard.writeText(text+" "+url);msg.textContent="Link copied! Paste it to invite your friends 📋"}
+  catch(e){
+    msg.innerHTML="";const a=document.createElement("a");
+    a.href="https://wa.me/?text="+encodeURIComponent(text+" "+url);a.target="_blank";a.rel="noopener";
+    a.textContent="Tap here to share on WhatsApp";a.style.color="var(--ink)";msg.appendChild(a);
+  }
+}
+function pick(k){if(ans[i]!==null)return;ans[i]=k;paint(k,true)}
+function go(d){const n=i+d;if(n<0||n>Q.length)return;i=n;render()}
+$("prev").onclick=()=>go(-1);
+$("next").onclick=()=>go(1);
+document.addEventListener("keydown",e=>{
+  if($("app").hidden||e.target.tagName==="INPUT")return;
+  if(e.key==="ArrowRight")go(1);if(e.key==="ArrowLeft")go(-1);
+});
+let sx=null;
+document.addEventListener("touchstart",e=>{sx=e.touches[0].clientX},{passive:true});
+document.addEventListener("touchend",e=>{
+  if(sx===null||$("app").hidden)return;
+  const dx=e.changedTouches[0].clientX-sx;sx=null;
+  if(Math.abs(dx)>70)go(dx<0?1:-1);
+},{passive:true});
+</script>
+</body>
+</html>
